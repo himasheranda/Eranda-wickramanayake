@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ERANDA SCIENCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-blue: #1a73e8;
+            --text-dark: #1f1f1f;
+            --text-light: #5f6368;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh; /* Changed from height: 100vh */
+            display: flex;
+            background-color: #fff;
+            /* Removed overflow: hidden so you can scroll on mobile */
+        }
+
+        /* --- Split Layout Container --- */
+        .split-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* --- Left Side: Image --- */
+        .image-side {
+            flex: 1;
+            background: url('https://img.sanishtech.com/u/fd203fa62cccdf2bef4b45bcadebd580.png') center/cover no-repeat;
+            display: block;
+        }
+
+        /* --- Right Side: Login Content --- */
+        .login-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: #ffffff;
+        }
+
+        .login-content {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .welcome-text {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            border-color: var(--accent-blue);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1557b0;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
+
+        .signup-link {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .signup-link a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* --- Updated Responsive View --- */
+        @media (max-width: 900px) {
+            .split-container {
+                flex-direction: column;
+            }
+            .image-side {
+                height: 250px; /* Set a fixed height for the header image on mobile */
+                flex: none;
+            }
+            .login-side {
+                flex: none;
+                padding: 40px 20px;
+                width: 100%;
+            }
+            h2 {
+                font-size: 1.6rem; /* Slightly smaller text for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-container">
+        <div class="image-side"></div>
+
+        <div class="login-side">
+            <div class="login-content">
+                <div class="welcome-text">Hi, welcome to </div>
+                <h2>Eranda Wickramanayakescience.lk</h2>
+                
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+
+                <button onclick="login()">Sign In</button>
+
+                <div class="signup-link">
+                    New student? <a href="signup.html">Create an account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh2ixTT2gaQ0eLNVg5GjMGy3BAGrIUe20",
+            authDomain: "eranda-wickramanayake.firebaseapp.com",
+            projectId: "eranda-wickramanayake",
+            storageBucket: "eranda-wickramanayake.firebasestorage.app",
+            messagingSenderId: "99264304270",
+            appId: "1:99264304270:web:af3f602f958b6a7d2525df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.login = async function() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!email || !password) {
+                alert("Please enter both email and password.");
+                return;
+            }
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                const userRef = doc(db, "user", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    if (userData.role === 'admin') {
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "index.html";
+                    }
+                } else {
+                    window.location.href = "index.html";
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert("Login failed: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

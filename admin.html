@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Eranda Science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    
+    <style>
+        :root {
+            --bg-color: #f0f4f9;
+            --accent-blue: #1a73e8;
+            --card-bg: #ffffff;
+            --text-main: #1f1f1f;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 40px 5%;
+            color: var(--text-main);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input, select {
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+            font-family: 'Outfit', sans-serif;
+            width: 100%;
+        }
+
+        input:focus { border-color: var(--accent-blue); background: #fff; }
+
+        .btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+            text-decoration: none; /* For link buttons */
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn-logout { background: #ea4335; }
+        .btn-manage { background: #1a73e8; } /* Gemini blue */
+        .btn-green { background: #1e8e3e; }
+        .btn-purple { background: #a142f4; }
+
+        .sidebar-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 8px 18px;
+            background: #e2e7ed;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab.active { background: var(--accent-blue); color: white; }
+
+        .class-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #eef2f6;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .visible { background: #e6f4ea; color: #1e8e3e; }
+        .hidden { background: #fce8e6; color: #d93025; }
+
+        .delete-btn { color: #ea4335; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .delete-btn:hover { background: #fce8e6; }
+
+        @media (max-width: 900px) { 
+            .input-group { grid-template-columns: 1fr; } 
+            .sidebar-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p style="color: #666;">Manage classes, recordings, and papers</p>
+        </div>
+        <div class="header-btns">
+            <a href="adminpage2.html" class="btn btn-manage">
+                <span class="material-symbols-rounded">group</span> Student Management
+            </a>
+            <button class="btn btn-logout" onclick="logout()">
+                <span class="material-symbols-rounded">logout</span> Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="section-title"><span class="material-symbols-rounded">school</span> Upload Main Lesson</div>
+        <div class="input-group">
+            <input id="title" placeholder="Lesson Title">
+            <input id="subtitle" placeholder="Subtitle (Optional)">
+            <input id="link" placeholder="Video/Zoom Link">
+            <select id="category">
+                <option value="grade10">Grade 10</option>
+                <option value="grade10adv">Grade 10 Adv</option>
+                <option value="grade11">Grade 11</option>
+                <option value="grade11adv">Grade 11 Adv</option>
+                <option value="revision2025">Revision 2025</option>
+                <option value="Class Recordings">Class Recordings</option>
+                <option value="Upcoming Papers">Upcoming Papers</option>
+            </select>
+            <button class="btn" onclick="addClass()">Save Item</button>
+        </div>
+    </div>
+
+    <div class="sidebar-grid">
+        <div class="admin-card">
+            <div class="section-title"><span class="material-symbols-rounded">videocam</span> Send Recording</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input id="rec-title" placeholder="Recording Name">
+                <input id="rec-link" placeholder="Recording Link">
+                <select id="rec-grade">
+                    <option value="grade10">For Grade 10</option>
+                    <option value="grade10adv">For Grade 10 Adv</option>
+                    <option value="grade11">For Grade 11</option>
+                    <option value="grade11adv">For Grade 11 Adv</option>
+                    <option value="revision2025">For Revision 2025</option>
+                </select>
+                <button class="btn btn-green" onclick="quickAdd('Class Recordings', 'rec-title', 'rec-link', 'rec-grade')">
+                    <span class="material-symbols-rounded">send</span> Post Recording
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="section-title"><span class="material-symbols-rounded">description</span> Send Paper</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input id="pap-title" placeholder="Paper Name">
+                <input id="pap-link" placeholder="Paper Link">
+                <select id="pap-grade">
+                    <option value="grade10">For Grade 10</option>
+                    <option value="grade10adv">For Grade 10 Adv</option>
+                    <option value="grade11">For Grade 11</option>
+                    <option value="grade11adv">For Grade 11 Adv</option>
+                    <option value="revision2025">For Revision 2025</option>
+                </select>
+                <button class="btn btn-purple" onclick="quickAdd('Upcoming Papers', 'pap-title', 'pap-link', 'pap-grade')">
+                    <span class="material-symbols-rounded">send</span> Post Paper
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="filterList('all', this)">All</div>
+        <div class="tab" onclick="filterList('Class Recordings', this)">🎥 Recordings</div>
+        <div class="tab" onclick="filterList('Upcoming Papers', this)">📄 Papers</div>
+        <div class="tab" onclick="filterList('grade', this)">📚 Classes</div>
+    </div>
+
+    <h3 style="margin-bottom: 15px;" id="listTitle">All Posted Content</h3>
+    <div id="classList"><p style="color: #999;">Loading content...</p></div>
+
+    <script type="module" src="admin.js"></script>
+
+    <script>
+        // Shared Quick Add logic
+        async function quickAdd(catType, titleId, linkId, gradeId) {
+            const t = document.getElementById(titleId).value;
+            const l = document.getElementById(linkId).value;
+            const targetGrade = document.getElementById(gradeId).value;
+            
+            if(!t || !l) return alert("Please fill Title and Link");
+
+            document.getElementById('title').value = t;
+            document.getElementById('link').value = l;
+            document.getElementById('category').value = catType;
+            document.getElementById('subtitle').value = "Target: " + targetGrade.toUpperCase();
+            
+            if(window.addClass) {
+                await window.addClass();
+                document.getElementById(titleId).value = "";
+                document.getElementById(linkId).value = "";
+            } else {
+                alert("System still loading, please wait a second.");
+            }
+        }
+
+        // Filter functionality
+        function filterList(type, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const items = document.querySelectorAll('.class-item');
+            
+            items.forEach(item => {
+                const cat = item.getAttribute('data-category');
+                if(type === 'all') {
+                    item.style.display = 'flex';
+                } else if(type === 'grade') {
+                    item.style.display = (cat !== 'Class Recordings' && cat !== 'Upcoming Papers') ? 'flex' : 'none';
+                } else {
+                    item.style.display = (cat === type) ? 'flex' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

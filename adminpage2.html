@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Independent Admin Dashboard - ERANDA SCIENCE</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #34a853;
+            --danger: #d93025;
+            --bg: #f1f3f4;
+            --white: #ffffff;
+            --dark: #202124;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        
+        /* Header & Back Button */
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-back {
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover { background: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+        #status-bar { 
+            background: #fff; padding: 12px; border-radius: 8px; 
+            margin-bottom: 20px; border: 1px solid #ccc; font-weight: bold;
+        }
+
+        .wrapper {
+            display: flex;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            flex: 1;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .user-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .user-item:hover { background: #f8f9fa; }
+        
+        .panel-a-selected { background: #e8f0fe !important; border-left: 5px solid var(--primary); font-weight: bold; }
+        .panel-b-selected { background: #fce8e6 !important; border-left: 5px solid var(--danger); font-weight: bold; }
+
+        .controls {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .block-section {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fdeaea;
+            border: 1px solid #fabdbe;
+            border-radius: 8px;
+        }
+
+        .target-text { font-size: 13px; font-weight: bold; margin-bottom: 10px; display: block; }
+        .a-color { color: var(--primary); }
+        .b-color { color: var(--danger); }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button { color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.97); }
+        .btn-a { background: var(--primary); }
+        .btn-b { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+    </style>
+</head>
+<body>
+
+    <div class="header-nav">
+        <a href="admin.html" class="btn-back">⬅ Back to Admin</a>
+        <h2 style="margin:0;">Dual-Panel Management</h2>
+    </div>
+
+    <div id="status-bar">Connecting to Firebase...</div>
+
+    <div class="wrapper">
+        <div class="panel" id="panel-a">
+            <h3>📝 Panel A: Marks</h3>
+            <input type="text" class="search-input" placeholder="Search Panel A..." onkeyup="filterLocal('list-a', this.value)">
+            <div class="list-container" id="list-a"></div>
+            
+            <div class="controls">
+                <span id="label-a" class="target-text a-color">Target: None Selected</span>
+                <input type="text" id="paper-name" placeholder="Paper Name">
+                <input type="number" id="marks-val" placeholder="Score">
+                <button class="btn-a" onclick="submitMarks()">Send Marks</button>
+            </div>
+        </div>
+
+        <div class="panel" id="panel-b">
+            <h3>🔑 Panel B: Access Control</h3>
+            <input type="text" class="search-input" placeholder="Search Panel B..." onkeyup="filterLocal('list-b', this.value)">
+            <div class="list-container" id="list-b"></div>
+
+            <div class="controls">
+                <span id="label-b" class="target-text b-color">Target: None Selected</span>
+                <select id="class-val">
+                    <option value="grade10">Grade 10</option>
+                    <option value="grade10adv">Grade 10 Advance</option>
+                    <option value="grade11">Grade 11</option>
+                    <option value="grade11adv">Grade 11 Advance</option>
+                    <option value="revision2025">Revision 2025</option>
+                </select>
+                <button class="btn-b" onclick="submitAccess()">Activate Class</button>
+
+                <div class="block-section">
+                    <button class="btn-danger" onclick="blockAccess()">⛔ BLOCK ALL ACCESS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, setDoc, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh2ixTT2gaQ0eLNVg5GjMGy3BAGrIUe20",
+            authDomain: "eranda-wickramanayake.firebaseapp.com",
+            projectId: "eranda-wickramanayake",
+            storageBucket: "eranda-wickramanayake.firebasestorage.app",
+            messagingSenderId: "99264304270",
+            appId: "1:99264304270:web:af3f602f958b6a7d2525df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let selectedIdA = null;
+        let selectedIdB = null;
+        let selectedEmailB = "";
+
+        // Toggle Selection Logic
+        window.selectA = (id, email, element) => {
+            if (selectedIdA === id) {
+                selectedIdA = null;
+                element.classList.remove('panel-a-selected');
+                document.getElementById('label-a').innerText = "Target: None Selected";
+            } else {
+                selectedIdA = id;
+                document.querySelectorAll('#list-a .user-item').forEach(el => el.classList.remove('panel-a-selected'));
+                element.classList.add('panel-a-selected');
+                document.getElementById('label-a').innerText = "Target: " + email;
+            }
+        };
+
+        window.selectB = (id, email, element) => {
+            if (selectedIdB === id) {
+                selectedIdB = null;
+                selectedEmailB = "";
+                element.classList.remove('panel-b-selected');
+                document.getElementById('label-b').innerText = "Target: None Selected";
+            } else {
+                selectedIdB = id;
+                selectedEmailB = email;
+                document.querySelectorAll('#list-b .user-item').forEach(el => el.classList.remove('panel-b-selected'));
+                element.classList.add('panel-b-selected');
+                document.getElementById('label-b').innerText = "Target: " + email;
+            }
+        };
+
+        window.filterLocal = (listId, val) => {
+            const items = document.getElementById(listId).getElementsByClassName('user-item');
+            for (let item of items) {
+                item.style.display = item.innerText.toLowerCase().includes(val.toLowerCase()) ? "block" : "none";
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.uid === "8DmtTDbssrRC6ttecB5VS26Clqt2") {
+                document.getElementById('status-bar').innerText = "✅ Admin Active: " + user.email;
+                loadLists();
+            } else {
+                document.getElementById('status-bar').innerHTML = "<span style='color:red'>❌ Unauthorized Access. Go to login page.</span>";
+            }
+        });
+
+        async function loadLists() {
+            try {
+                // We use the "user" collection because that's what your app uses
+                const q = query(collection(db, "user"), orderBy("email", "asc"));
+                const snap = await getDocs(q);
+                const listA = document.getElementById('list-a');
+                const listB = document.getElementById('list-b');
+                
+                listA.innerHTML = "";
+                listB.innerHTML = "";
+
+                snap.forEach(userDoc => {
+                    const data = userDoc.data();
+                    const email = data.email || 'No Email';
+                    const name = data.name || 'Student';
+                    const currentClass = data.class || 'None';
+
+                    const itemHtml = `<div class="user-item" data-id="${userDoc.id}"><b>${name}</b> [${currentClass}]<br><small>${email}</small></div>`;
+                    
+                    // Add to List A
+                    const divA = document.createElement('div');
+                    divA.className = "user-item";
+                    divA.innerHTML = `<b>${name}</b><br><small>${email}</small>`;
+                    divA.onclick = function() { selectA(userDoc.id, email, this); };
+                    listA.appendChild(divA);
+
+                    // Add to List B
+                    const divB = document.createElement('div');
+                    divB.className = "user-item";
+                    divB.innerHTML = `<b>${name}</b> [${currentClass}]<br><small>${email}</small>`;
+                    divB.onclick = function() { selectB(userDoc.id, email, this); };
+                    listB.appendChild(divB);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        window.submitMarks = async () => {
+            if(!selectedIdA) return alert("Select student in Panel A");
+            const paper = document.getElementById('paper-name').value;
+            const marks = document.getElementById('marks-val').value;
+            
+            if(!paper || !marks) return alert("Fill in paper name and marks");
+
+            try {
+                // Using addDoc to create a new unique record for every mark sent
+                await addDoc(collection(db, "user", selectedIdA, "my_marks"), { 
+                    title: paper, 
+                    marks: marks, 
+                    timestamp: new Date() 
+                });
+                alert("Marks Sent successfully to Student!");
+                document.getElementById('marks-val').value = "";
+            } catch (e) { alert("Error: " + e.message); }
+        };
+
+        window.submitAccess = async () => {
+            if(!selectedIdB) return alert("Select student in Panel B");
+            const val = document.getElementById('class-val').value;
+            try {
+                // Update the student's "class" field
+                await updateDoc(doc(db, "user", selectedIdB), { class: val });
+                alert("Access UNLOCKED for " + val.toUpperCase());
+                loadLists(); // Refresh list to show new class status
+            } catch (e) { alert(e.message); }
+        };
+
+        window.blockAccess = async () => {
+            if(!selectedIdB) return alert("Select student in Panel B");
+            if(confirm("Are you sure you want to BLOCK " + selectedEmailB + "?")) {
+                try {
+                    // Set class to "locked" so student sees everything locked
+                    await updateDoc(doc(db, "user", selectedIdB), { class: "locked" });
+                    alert("Account BLOCKED successfully");
+                    loadLists(); // Refresh list
+                } catch (e) { alert(e.message); }
+            }
+        };
+    </script>
+</body>
+</html>
