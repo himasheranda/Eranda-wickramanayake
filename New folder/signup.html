@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ERANDA SCIENCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Split Screen Wrapper */
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Left side: Image */
+        .image-side {
+            flex: 1;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                        url('https://img.sanishtech.com/u/fd203fa62cccdf2bef4b45bcadebd580.png');
+            background-size: cover;
+            background-position: center;
+            display: block;
+        }
+
+        /* Right side: Signup Form */
+        .form-side {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 40px;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .welcome-msg {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-top: 0; 
+            margin-bottom: 25px; 
+            color: #000000; 
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 13px 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #1a73e8;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        button:hover { 
+            background: #060708; 
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .login-link a { 
+            color: #000000; 
+            text-decoration: none; 
+            font-weight: 600; 
+        }
+
+        /* Responsive: Stack vertically on mobile */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
+            .image-side {
+                height: 30vh;
+                min-height: 200px;
+            }
+            .form-side {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="image-side"></div>
+
+        <div class="form-side">
+            <div class="signup-container">
+                <div class="welcome-msg"> hi welcome to Eranda wickramanayke.lk</div>
+                <h2>Sign Up</h2>
+                
+                <input type="text" id="name" placeholder="Full Name">
+                
+                <input type="email" id="email" placeholder="Email Address">
+                
+                <select id="userClass">
+                    <option value="" disabled selected>Select Your Class</option>
+                    <option value="grade10">Grade 10</option>
+                    <option value="grade10adv">Grade 10 Adv</option>
+                    <option value="grade11">Grade 11</option>
+                    <option value="grade11adv">Grade 11 Adv</option>
+                    <option value="revision2025">Revision 2025</option>
+                </select>
+
+                <input type="password" id="password" placeholder="Create Password">
+                
+                <button onclick="signup()">Create Account</button>
+                
+                <div class="login-link">
+                    Already have an account? <a href="login.html">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh2ixTT2gaQ0eLNVg5GjMGy3BAGrIUe20",
+            authDomain: "eranda-wickramanayake.firebaseapp.com",
+            projectId: "eranda-wickramanayake"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.signup = async function() {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const selectedClass = document.getElementById("userClass").value;
+            const password = document.getElementById("password").value;
+
+            if (!name || !email || !selectedClass || !password) {
+                alert("Please fill all fields and select a class.");
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(doc(db, "user", user.uid), {
+                    name: name,
+                    email: email,
+                    class: selectedClass,
+                    role: "student",
+                    createdAt: new Date()
+                });
+
+                alert("Signup successful! Welcome to the class.");
+                window.location.href = "index.html"; 
+
+            } catch (error) {
+                console.error("Error Detail:", error);
+                alert("Signup failed: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
