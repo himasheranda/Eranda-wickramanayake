@@ -20,10 +20,10 @@
         }
 
         body {
-            min-height: 100vh; /* Changed from height: 100vh */
+            min-height: 100vh;
             display: flex;
             background-color: #fff;
-            /* Removed overflow: hidden so you can scroll on mobile */
+            overflow-x: hidden;
         }
 
         /* --- Split Layout Container --- */
@@ -137,16 +137,17 @@
                 flex-direction: column;
             }
             .image-side {
-                height: 250px; /* Set a fixed height for the header image on mobile */
+                height: 220px; /* Fixed height for mobile image */
+                width: 100%;
                 flex: none;
             }
             .login-side {
-                flex: none;
-                padding: 40px 20px;
+                flex: 1;
+                padding: 30px 20px;
                 width: 100%;
             }
             h2 {
-                font-size: 1.6rem; /* Slightly smaller text for mobile */
+                font-size: 1.6rem;
             }
         }
     </style>
@@ -159,7 +160,7 @@
         <div class="login-side">
             <div class="login-content">
                 <div class="welcome-text">Hi, welcome to </div>
-                <h2>Eranda Wickramanayakescience.lk</h2>
+                <h2>Eranda Wickramanayake Science</h2>
                 
                 <div class="input-group">
                     <label>Email Address</label>
