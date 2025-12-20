@@ -462,6 +462,12 @@
 
         let currentUserId = null;
 
+        // PREVENTION: Warn user before leaving or accidental back button
+        window.addEventListener('beforeunload', function (e) {
+            e.preventDefault();
+            e.returnValue = ''; // Required for Chrome
+        });
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserId = user.uid;
@@ -609,3 +615,7 @@
     </script>
 </body>
 </html>
+    </script>
+</body>
+</html>
+
