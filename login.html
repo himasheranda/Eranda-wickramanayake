@@ -36,7 +36,16 @@
         /* --- Left Side: Image --- */
         .image-side {
             flex: 1;
-            background: url('https://img.sanishtech.com/u/fd203fa62cccdf2bef4b45bcadebd580.png') center/cover no-repeat;
+            position: relative;
+            overflow: hidden;
+            background-color: #f0f0f0; /* Fallback color */
+        }
+
+        /* This ensures the image behaves like a background but is forced to load */
+        .image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
         }
 
@@ -131,23 +140,23 @@
             font-weight: 600;
         }
 
-        /* --- Updated Responsive View --- */
+        /* --- Responsive View --- */
         @media (max-width: 900px) {
             .split-container {
                 flex-direction: column;
             }
             .image-side {
-                height: 220px; /* Fixed height for mobile image */
+                height: 250px; /* Force visibility on mobile */
                 width: 100%;
                 flex: none;
             }
             .login-side {
                 flex: 1;
-                padding: 30px 20px;
+                padding: 40px 20px;
                 width: 100%;
             }
             h2 {
-                font-size: 1.6rem;
+                font-size: 1.7rem;
             }
         }
     </style>
@@ -155,7 +164,9 @@
 <body>
 
     <div class="split-container">
-        <div class="image-side"></div>
+        <div class="image-side">
+            <img src="https://img.sanishtech.com/u/fd203fa62cccdf2bef4b45bcadebd580.png" alt="Science Background">
+        </div>
 
         <div class="login-side">
             <div class="login-content">
