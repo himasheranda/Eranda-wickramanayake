@@ -27,9 +27,9 @@
         body {
             background-color: var(--bg-color);
             display: flex;
-            min-height: 100vh; /* Changed from fixed height */
+            min-height: 100vh;
             position: relative;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
         }
 
         /* --- Sidebar Section --- */
@@ -88,7 +88,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            height: 100vh; /* Fixed height for scrolling internally */
+            height: 100vh;
             overflow-y: auto;
         }
 
@@ -116,7 +116,6 @@
         }
 
         .icon-btn:hover { background: #e2e7ed; }
-
         #back-arrow { display: none; color: var(--accent-blue); }
 
         .notif-dropdown {
@@ -147,7 +146,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            display: block;
+            min-height: 300px; /* Ensures image has height even if empty */
         }
 
         .split-details {
@@ -163,9 +162,7 @@
 
         .view-page.active { display: block; }
 
-        #home {
-            padding: 20px 5% 50px;
-        }
+        #home { padding: 20px 5% 50px; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -290,8 +287,10 @@
                 flex-direction: column; 
             }
             .split-image { 
-                height: 180px; 
+                width: 100%;
+                height: 250px; /* Fixed height for mobile visibility */
                 flex: none;
+                display: block !important; /* Ensure it's not hidden */
             }
             .split-details { 
                 padding: 25px 15px; 
@@ -305,7 +304,7 @@
                 font-size: 1.4rem;
             }
             header h2 {
-                display: none; /* Hide long title on small phones */
+                font-size: 0.9rem;
             }
             .list-item {
                 flex-direction: column;
@@ -350,7 +349,7 @@
                 <div class="icon-btn" id="back-arrow" onclick="showPage('home')">
                     <span class="material-symbols-rounded">arrow_back</span>
                 </div>
-                <h2 style="font-size: 1rem; font-weight: 600; color: #1f1f1f;">ERANDA SCIENCE.lk</h2>
+                <h2 style="font-weight: 600; color: #1f1f1f;">ERANDA SCIENCE.lk</h2>
             </div>
             
             <div style="display: flex; align-items: center; gap: 10px;">
